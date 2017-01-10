@@ -1,60 +1,48 @@
 <html>
 <body onclick="stop=true;">
 
-<div id="test" class="compas">
-    <div class="nota">
-        1
-    </div>
+	<div id="patternTemplate" style="display: none">
+	    <div class="nota">
+	        1
+	    </div>
 
-    <div class="nota" style="top: 100px; left:200px;">
-        2
-    </div>
+	    <div class="nota" style="top: 100px; left:200px;">
+	        2
+	    </div>
 
-    <div class="nota" style="top: 200px; left:400px;">
-        3
-    </div>
+	    <div class="nota" style="top: 200px; left:400px;">
+	        4
+	    </div>
 
-    <div class="nota" style="top: 300px; left:300px;">
-        3
-    </div>
+	    <div class="nota" style="top: 300px; left:300px;">
+	        3
+	    </div>
+	</div>
+
+
+<div id="container">
+	<div id="pulso" class="pulso" style="top: 200px; left:10px; position:absolute;">
+	    pulso
+	</div>
 </div>
-
-<div id="test1" class="compas" style=" left:2000px;">
-    <div class="nota">
-        1
-    </div>
-
-    <div class="nota" style="top: 100px; left:100px;">
-        2
-    </div>
-
-    <div class="nota" style="top: 200px; left:200px;">
-        3
-    </div>
-
-    <div class="nota" style="top: 300px; left:400px;">
-        3
-    </div>
-</div>
-
-
-
-
-<div id="pulso" class="pulso" style="top: 200px; left:10px; position:absolute;">
-    pulso
-</div>
-
 </body>
 
 </html>
 <style>
+#container {
+	width: 100%;
+	height: 100%;
+	background-color: aaaaaa;
+	overflow:hidden;
+}
     .compas {
-        position: absolute;
-        top: 0px;
+        position: relative;
+        top: 100px;
         left:0px;
     }
+
     .nota {
-        background-color: red;
+        background-color: #999999;
         -moz-border-radius: 20px;
         border-radius: 20px;
         border-color:red;
@@ -64,8 +52,10 @@
         padding-top:5px;
         padding-bottom:5px;
         font-size:1.5em;
-        position:relative;
+        width: 16px;
+        position: relative;
     }
+
     .pulso {
         background-color: black;
         -moz-border-radius: 20px;
@@ -84,66 +74,81 @@
 
 <script>
 var stop = false;
-var max_x = 1000;
+var start_x = parseInt(window.getComputedStyle(document.getElementById('container')).width.replace('px',''));
 var lastTime = -1;
 var fps = 30;
 var bpm = 60000 / 60;
 var global_speed = 120/1000;
 var bpm_progress = 0;
-var animationLength = 10000; // Animation length in milliseconds
+var patterns=[];
+var lastPatternId=0;
 
-function formatDiv(id,progress) {
-    var div = document.getElementById(id);
-    if (div.x == undefined) div.x = parseInt(div.style.left.replace('px',''));
-    if (div.y == undefined) div.y = 100;
-    if (div.speed == undefined) div.speed = 1;
-    //if (div.t == undefined) div.t = timestamp;
-        
-    //div.innerHTML= (1000/progress).toFixed(4) ;
-    if (div.x > 0) {
-        div.x -= (div.speed * global_speed * (progress==0?1:progress));
-        div.style.left = div.x +'px';
+function createPattern() {
+	var newPattern = document.createElement("DIV");
+	var divContainer = document.getElementById('container');
+
+	newPattern.innerHTML=document.getElementById('patternTemplate').innerHTML+'fedeee';
+	newPattern.className='compas';
+	newPattern.id='pat'+lastPatternId;
+	lastPatternId++;
+	divContainer.appendChild(newPattern);
+    if (newPattern.x == undefined) newPattern.x = start_x;
+    if (newPattern.y == undefined) newPattern.y = 100;
+    if (newPattern.w == undefined) newPattern.w = parseInt(window.getComputedStyle(newPattern).width.replace('px',''));
+    if (newPattern.speed == undefined) newPattern.speed = 1;
+    patterns.push(newPattern);
+}
+
+function formatDiv(index,progress) {
+    var divCompas = patterns[index];
+
+    console.debug('divCompas.x:'+divCompas.x);
+    if (divCompas.x > -divCompas.w) {
+        divCompas.x -= (divCompas.speed * global_speed * (progress==0?1:progress));
+        divCompas.style.left = divCompas.x +'px';
     } 
     else {
-        div.x=max_x;
+        divCompas.x = start_x;
     }
 }
 
 function doAnimation(timestamp) {
-  var progress = 0;
+	var progress = 0;
 
-  if (lastTime < 0) {
-        lastTime = timestamp;
-  } else {
-        progress = timestamp - lastTime;
-        bpm_progress+=progress;
-        if (progress>=fps) {
-            lastTime = timestamp;
-      } else {
-            requestAnimationFrame(doAnimation);
-            return;  
-      }
-  }
-  
-formatDiv('test', progress);
-formatDiv('test1', progress);
+	if (lastTime < 0) {
+	    lastTime = timestamp;
+	} else {
+	    progress = timestamp - lastTime;
+	    bpm_progress += progress;
+	    if (progress >= 1000/fps) {
+	        lastTime = timestamp;
+	  } else {
+	        requestAnimationFrame(doAnimation);
+	        return;  
+	  }
+	}
+	  
 
-if (bpm_progress > bpm) {
-    var div = document.getElementById('pulso');
-    div.innerHTML="P";
-    setTimeout(function () {
-        var div = document.getElementById('pulso');
-        div.innerHTML="";
-    },100);
-    bpm_progress=0;
-}
+	formatDiv(0, progress);
+//	formatDiv('test1', progress);
+
+	if (bpm_progress > bpm) {
+	    var divPulso = document.getElementById('pulso');
+	    divPulso.innerHTML="P";
+	    setTimeout(function () {
+	        var divPulso = document.getElementById('pulso');
+	        divPulso.innerHTML="";
+	    },100);
+	    bpm_progress = 0;
+	}
 
 
-  if (!stop) {
-        requestAnimationFrame(doAnimation);
-  }
+	if (!stop) {
+	    requestAnimationFrame(doAnimation);
+	}
 }
 
 // Start animation
+createPattern();
 window.requestAnimationFrame(doAnimation);
 </script>
