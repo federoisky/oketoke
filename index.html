@@ -1,30 +1,30 @@
 <html>
 <body onclick="stop=true;">
 
-	<div id="patternTemplate" style="display: none">
-	    <div class="nota">
-	        1
-	    </div>
-
-	    <div class="nota" style="top: 100px; left:200px;">
-	        2
-	    </div>
-
-	    <div class="nota" style="top: 200px; left:400px;">
-	        4
-	    </div>
-
-	    <div class="nota" style="top: 300px; left:300px;">
-	        3
-	    </div>
-	</div>
-
+<audio id="tick" src="Tick.ogg" autostart="true" ></audio>
 
 <div id="container">
 	<div id="pulso" class="pulso" style="top: 200px; left:10px; position:absolute;">
 	    pulso
 	</div>
 </div>
+<div id="patternTemplate" style="display: none; left: 2000;">
+	<div class="nota" id="nota1">
+		1
+	</div>
+	<div class="nota" style="top: 100px; left:200px;">
+		2
+	</div>
+
+	<div class="nota" style="top: 200px; left:400px;">
+		4
+	</div>
+
+	<div class="nota" style="top: 300px; left:300px;">
+		3
+	</div>
+</div>
+
 </body>
 
 </html>
@@ -39,6 +39,21 @@
         position: relative;
         top: 100px;
         left:0px;
+    }
+
+    .notota {
+        background-color: red;
+		        -moz-border-radius: 20px;
+        border-radius: 20px;
+        border-color:red;
+        color:white;
+        padding-left:12px;
+        padding-right:12px;
+        padding-top:5px;
+        padding-bottom:5px;
+        font-size:1.5em;
+        width: 16px;
+        position: relative;
     }
 
     .nota {
@@ -87,9 +102,10 @@ function createPattern() {
 	var newPattern = document.createElement("DIV");
 	var divContainer = document.getElementById('container');
 
-	newPattern.innerHTML=document.getElementById('patternTemplate').innerHTML+'fedeee';
+	newPattern.innerHTML=document.getElementById('patternTemplate').innerHTML;
 	newPattern.className='compas';
 	newPattern.id='pat'+lastPatternId;
+	newPattern.style.left="2000px";
 	lastPatternId++;
 	divContainer.appendChild(newPattern);
     if (newPattern.x == undefined) newPattern.x = start_x;
@@ -101,9 +117,13 @@ function createPattern() {
 
 function formatDiv(index,progress) {
     var divCompas = patterns[index];
-
-    console.debug('divCompas.x:'+divCompas.x);
     if (divCompas.x > -divCompas.w) {
+		if (divCompas.offsetLeft + document.getElementById('nota1').offsetLeft < 150) {
+			var nota=document.getElementById('nota1');
+			nota.innerHTML="notota";
+			nota.className="notota";
+			console.log(divCompas.offsetLeft +document.getElementById('nota1').offsetLeft);
+		}
         divCompas.x -= (divCompas.speed * global_speed * (progress==0?1:progress));
         divCompas.style.left = divCompas.x +'px';
     } 
@@ -135,6 +155,9 @@ function doAnimation(timestamp) {
 	if (bpm_progress > bpm) {
 	    var divPulso = document.getElementById('pulso');
 	    divPulso.innerHTML="P";
+		var soundTick = document.getElementById('tick');
+        soundTick.play();
+
 	    setTimeout(function () {
 	        var divPulso = document.getElementById('pulso');
 	        divPulso.innerHTML="";
