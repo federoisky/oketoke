@@ -4,72 +4,165 @@
 <audio id="tick" src="Tick.ogg" autostart="true" ></audio>
 
 <div id="container">
-	<div id="pulso" class="pulso" style="top: 200px; left:10px; position:absolute;">
-	    pulso
-	</div>
+	<div id="playBar"></div>
+	<div id="cuerda1"></div>
+	<div id="cuerda2"></div>
+	<div id="cuerda3"></div>
+	<div id="cuerda4"></div>
 </div>
-<div id="patternTemplate" style="display: none; left: 2000;">
-	<div class="nota" id="nota1">
-		1
-	</div>
-	<div class="nota" style="top: 100px; left:200px;">
-		2
-	</div>
-
-	<div class="nota" style="top: 200px; left:400px;">
-		4
-	</div>
-
-	<div class="nota" style="top: 300px; left:300px;">
-		3
-	</div>
-</div>
-
 </body>
 
 </html>
 <style>
+body {
+    overflow:hidden;
+}
+
 #container {
 	width: 100%;
 	height: 100%;
-	background-color: aaaaaa;
-	overflow:hidden;
+	background-color: #000000;
+	overflow: hidden;
+}
+
+#playBar {
+	border-left: solid 5px #ff0000;
+	position: absolute;
+	height: 100%;
+	width: 1px;
+	left: 200px;
+	top: 0px;
+}
+.playBarOn {
+	border-left: solid 10px #ffffff !important;
+
+}
+
+
+#cuerda1 {
+	width: 100%;
+	height: 4px;
+	position: absolute;
+	left: 0px;
+	top: 10%;
+	background-color: #fff;
+}
+
+#cuerda2 {
+	width: 100%;
+	height: 6px;
+	position: absolute;
+	left: 0px;
+	top: 35%;
+	background-color: #fff;
+}
+
+#cuerda3 {
+	width: 100%;
+	height: 8px;
+	position: absolute;
+	left: 0px;
+	top: 60%;
+	background-color: #fff;
+}
+
+#cuerda4 {
+	width: 100%;
+	height: 10px;
+	position: absolute;
+	left: 0px;
+	top: 85%;
+	background-color: #fff;
 }
     .compas {
-        position: relative;
-        top: 100px;
-        left:0px;
+        position: absolute;
+		height: 100%;
+		top:0px;
+		width: 100%;
+		border-right: solid 2px #00ff00;
     }
+	.patternText {
+			color: #fff;
+			font-size: 25px;
+			top:20px;
+			position: absolute;
+			left:0;
 
-    .notota {
-        background-color: red;
-		        -moz-border-radius: 20px;
-        border-radius: 20px;
-        border-color:red;
-        color:white;
-        padding-left:12px;
-        padding-right:12px;
-        padding-top:5px;
-        padding-bottom:5px;
-        font-size:1.5em;
-        width: 16px;
-        position: relative;
+	}
+
+    .notaPlay {
+		margin:0;
+		width: 0;
+		font-size: 0em;
+		-moz-transition: all .51s;
+   		-o-transition: all .51s;
+   		-webkit-transition: all .51s;
+   		transition: all .51s;
+	    animation-name: notaPlay;
+    	animation-duration: 1s;
     }
+	
+@keyframes notaPlay {
+    0%   {
+		font-size: 10em;
+        width: 8%;
+		background-color: red;
+		color: #000000;}
+		
+    10%  {
+		font-size: 12em;
+		background-color: red;
+		width: 10%;
+		color: #000000;
+		margin:-7.5%;}
+    100% {
+		font-size: 0em;
+		background-color: black;
+		margin:-1.5%;
+		color: #fff;
+		width: 1%;}
+}
 
     .nota {
-        background-color: #999999;
-        -moz-border-radius: 20px;
-        border-radius: 20px;
-        border-color:red;
-        color:white;
-        padding-left:12px;
-        padding-right:12px;
-        padding-top:5px;
-        padding-bottom:5px;
-        font-size:1.5em;
-        width: 16px;
-        position: relative;
+		text-align: center;
+		vertical-align: middle;
+		margin:-5%;
+		box-sizing: inherit;
+        background-color: #000000;
+        -moz-border-radius: 80px;
+        border-radius: 80px;
+        border: solid 3px #ff0000;
+        color:#ffffff;
+        font-size: 10em;
+		font-weight: bold;
+		font-family:monospace;
+        width: 8%;
+        position:absolute;
     }
+
+.cuerda1 {top: 10%;}
+.cuerda2 {top: 35%;}
+.cuerda3 {top: 60%;}
+.cuerda4 {top: 85%;}
+
+.t00{left: 0%}
+.t01{left: 6.25%}
+.t02{left: 12.5%}
+.t03{left: 18.75%}
+.t04{left: 25%}
+.t05{left: 31.25%}
+.t06{left: 37.5%}
+.t07{left: 43.75%}
+.t08{left: 50%}
+.t09{left: 56.25%}
+.t10{left: 62.5%}
+.t11{left: 68.75%}
+.t12{left: 75%}
+.t13{left: 81.25%}
+.t14{left: 87.5%}
+.t15{left: 93.75%}
+
+
 
     .pulso {
         background-color: black;
@@ -89,43 +182,81 @@
 
 <script>
 var stop = false;
-var start_x = parseInt(window.getComputedStyle(document.getElementById('container')).width.replace('px',''));
+var start_x = 100;
 var lastTime = -1;
 var fps = 30;
 var bpm = 60000 / 60;
-var global_speed = 120/1000;
+var global_speed = 10/1000;
 var bpm_progress = 0;
 var patterns=[];
 var lastPatternId=0;
+var notaTemplate="<div class='nota cuerda{1} t{0}'>{2}</div>";
+/*Tiempo, Cuerda, Dedo*/
+/*Tiempo 0-15*/
+/*Cuerda 1-4*/
+/*Dedo string*/
+var compas = [[0,3,0],[1,2,0],[2,1,1],[3,1,0],[4,1,1],[5,2,0],[6,1,1],[7,2,0],[8,3,0],[9,2,0],[10,1,1],[11,1,0],[12,1,1],[13,2,0],[14,1,1],[15,2,0]];
 
 function createPattern() {
-	var newPattern = document.createElement("DIV");
+	var strNotas="";
+	var strNumero="";
 	var divContainer = document.getElementById('container');
+	var newPattern = document.createElement("DIV");
+	strNotas = '<span class="patternText">' + lastPatternId + '</span>';
+	for (var i =0; i< compas.length;i++) {
+		strNumero = compas[i][2];
+		if (compas[i][0]<10) {
+			strTempo = ("0"+compas[i][0]);
+		} else {
+			strTempo = compas[i][0];
+		}
+		strNotas+=notaTemplate.replace("{0}",strTempo).replace("{1}",compas[i][1]).replace("{2}",strNumero);
+	}
 
-	newPattern.innerHTML=document.getElementById('patternTemplate').innerHTML;
+	newPattern.innerHTML=strNotas;
 	newPattern.className='compas';
 	newPattern.id='pat'+lastPatternId;
-	newPattern.style.left="2000px";
+	newPattern.style.left="100%";
+	newPattern.style.top=0;
 	lastPatternId++;
 	divContainer.appendChild(newPattern);
-    if (newPattern.x == undefined) newPattern.x = start_x;
-    if (newPattern.y == undefined) newPattern.y = 100;
+
+	if (patterns.length!=0) {
+		newPattern.x = (start_x + patterns[patterns.length-1].x);
+	}
+	else {
+		newPattern.x = start_x;
+	}
+    
+    if (newPattern.y == undefined) newPattern.y = 0;
     if (newPattern.w == undefined) newPattern.w = parseInt(window.getComputedStyle(newPattern).width.replace('px',''));
     if (newPattern.speed == undefined) newPattern.speed = 1;
+
     patterns.push(newPattern);
 }
 
 function formatDiv(index,progress) {
     var divCompas = patterns[index];
     if (divCompas.x > -divCompas.w) {
-		if (divCompas.offsetLeft + document.getElementById('nota1').offsetLeft < 150) {
-			var nota=document.getElementById('nota1');
-			nota.innerHTML="notota";
-			nota.className="notota";
-			console.log(divCompas.offsetLeft +document.getElementById('nota1').offsetLeft);
+		if (divCompas.offsetLeft < 250) {
+			var notas=divCompas.getElementsByClassName("nota");
+			for (var i=0; i < notas.length; i++) {
+				if (notas[i].className.indexOf("notaPlay") < 0) {
+					if (divCompas.offsetLeft + notas[i].offsetLeft < 200) {
+						notas[i].className+=" notaPlay";
+					}
+				}
+			}
+			if (divCompas.offsetLeft < -divCompas.w) {
+				console.debug(divCompas.w);
+				console.debug(patterns.length);
+				patterns.splice(index,1);
+				createPattern();
+				return;
+			}
 		}
         divCompas.x -= (divCompas.speed * global_speed * (progress==0?1:progress));
-        divCompas.style.left = divCompas.x +'px';
+        divCompas.style.left = divCompas.x +'%';
     } 
     else {
         divCompas.x = start_x;
@@ -148,20 +279,19 @@ function doAnimation(timestamp) {
 	  }
 	}
 	  
-
-	formatDiv(0, progress);
+	for (var i = 0; i<patterns.length;i++){
+		formatDiv(i, progress);
+	}
 //	formatDiv('test1', progress);
 
 	if (bpm_progress > bpm) {
-	    var divPulso = document.getElementById('pulso');
-	    divPulso.innerHTML="P";
-		var soundTick = document.getElementById('tick');
-        soundTick.play();
+	   /* var divPulso = document.getElementById('playBar');
+	    divPulso.className="playBarOn";
 
 	    setTimeout(function () {
-	        var divPulso = document.getElementById('pulso');
-	        divPulso.innerHTML="";
-	    },100);
+	        var divPulso = document.getElementById('playBar');
+	        divPulso.className="";
+	    },100);*/
 	    bpm_progress = 0;
 	}
 
@@ -172,6 +302,7 @@ function doAnimation(timestamp) {
 }
 
 // Start animation
+createPattern();
 createPattern();
 window.requestAnimationFrame(doAnimation);
 </script>
